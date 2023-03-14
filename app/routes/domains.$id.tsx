@@ -3,41 +3,41 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { deleteNote, getNote } from "~/models/note.server";
+import { getDomain, deleteDomain } from "~/models/domain.server";
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.id, "id not found");
 
-  const note = await getNote({ userId, id: params.noteId });
-  if (!note) {
+  const domain = await getDomain({ userId, id: params.id });
+  if (!domain) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ note });
+  return json({ domain });
 }
 
 export async function action({ request, params }: ActionArgs) {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.id, "id not found");
 
-  await deleteNote({ userId, id: params.noteId });
+  await deleteDomain({ userId, id: params.id });
 
-  return redirect("/notes");
+  return redirect("/domains");
 }
 
-export default function NoteDetailsPage() {
+export default function Id() {
   const data = useLoaderData<typeof loader>();
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.domain.url}</h3>
+      <p className="py-6">{data.domain.remarks}</p>
       <hr className="my-4" />
       <Form method="post">
         <button
           type="submit"
-          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+          className="rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-blue-400"
         >
           Delete
         </button>
@@ -56,7 +56,7 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Note not found</div>;
+    return <div>Domain not found</div>;
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);

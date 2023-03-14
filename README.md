@@ -1,4 +1,4 @@
-# wx-domain-check
+# wx-domain-detect
 
 > Detect whether the domain name is blocked inside WeChat
 
