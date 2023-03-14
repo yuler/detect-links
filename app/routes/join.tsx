@@ -27,6 +27,13 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
+  if (!email.endsWith('@col.com')) {
+    return json(
+      { errors: { email: "Email is must end with @col.com", password: null } },
+      { status: 400 }
+    );
+  }
+
   if (typeof password !== "string" || password.length === 0) {
     return json(
       { errors: { email: null, password: "Password is required" } },
@@ -34,7 +41,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  if (password.length < 8) {
+  if (password.length < 6) {
     return json(
       { errors: { email: null, password: "Password is too short" } },
       { status: 400 }
