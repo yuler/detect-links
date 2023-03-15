@@ -12,7 +12,7 @@ export async function createLink({
   notifyWecomToken,
   notifyWecomMobile,
   notifyWebhook,
-}: Omit<Link, "id" | "createdAt" | "updatedAt">) {
+}: Omit<Link, "id" | "createdAt" | "updatedAt" | "blocked">) {
   return prisma.link.create({
     data: {
       url,
