@@ -12,35 +12,48 @@ export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const url = formData.get("url");
   const remarks = formData.get("remarks");
+  const notifyEmail = formData.get("notifyEmail") as string;
+  const notifyWecomToken = formData.get("notifyWecomToken") as string;
+  const notifyWecomMobile = formData.get("notifyWecomMobile") as string;
+  const notifyWebhook = formData.get("notifyWebhook") as string;
 
   if (typeof url !== "string" || url.length === 0) {
+    return json({ error: "url is required" }, { status: 400 });
+  }
+
+  if (!url.startsWith("https://")) {
+    return json({ error: "url must starts with https://" }, { status: 400 });
+  }
+
+  if (typeof remarks !== "string" || remarks.length === 0) {
+    return json({ error: "remarks is required" }, { status: 400 });
+  }
+
+  if (notifyEmail && !notifyEmail.endsWith("@Wecom.com")) {
     return json(
-      { errors: { url: "url is required", remarks: null } },
+      { error: "notifyEmail is must end with @col.com" },
       { status: 400 }
     );
   }
 
-  // Must starts with https:// or http://
-  if (!url.startsWith("https://") && !url.startsWith("http://")) {
+  // notifyWecomToken
+  if (notifyWecomMobile && notifyWecomMobile.length !== 11) {
+    return json(
+      { error: "notifyWecomMobile is must length 11" },
+      { status: 400 }
+    );
+  }
+
+  if (notifyWebhook && !notifyWebhook.startsWith("https://")) {
     return json(
       {
-        errors: {
-          url: "url must starts with https:// or http://",
-          remarks: null,
-        },
+        error: "notifyWebhook must starts with https://",
       },
       { status: 400 }
     );
   }
 
-  if (typeof remarks !== "string" || remarks.length === 0) {
-    return json(
-      { errors: { url: null, remarks: "remarks is required" } },
-      { status: 400 }
-    );
-  }
-
-  const link = await createLink({ url, remarks, userId });
+  const link = await createLink({ userId, url, remarks, notifyEmail, notifyWecomToken, notifyWecomMobile, notifyWebhook });
 
   return redirect(`/links/${link.id}`);
 }
@@ -48,13 +61,10 @@ export async function action({ request }: ActionArgs) {
 export default function New() {
   const actionData = useActionData<typeof action>();
   const urlRef = React.useRef<HTMLInputElement>(null);
-  const remarksRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors?.url) {
+    if (actionData?.error) {
       urlRef.current?.focus();
-    } else if (actionData?.errors?.remarks) {
-      remarksRef.current?.focus();
     }
   }, [actionData]);
 
@@ -68,46 +78,72 @@ export default function New() {
         width: "100%",
       }}
     >
+      
       <div>
         <label className="flex w-full flex-col gap-1">
-          <span>url: </span>
+          <span>URL: </span>
           <input
             ref={urlRef}
             name="url"
             className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
-            aria-invalid={actionData?.errors?.url ? true : undefined}
-            aria-errormessage={
-              actionData?.errors?.url ? "url-error" : undefined
-            }
           />
         </label>
-        {actionData?.errors?.url && (
-          <div className="pt-1 text-red-700" id="url-error">
-            {actionData.errors.url}
-          </div>
-        )}
+        
       </div>
 
       <div>
         <label className="flex w-full flex-col gap-1">
           <span>remarks: </span>
           <textarea
-            ref={remarksRef}
             name="remarks"
             rows={8}
             className="w-full flex-1 rounded-md border-2 border-blue-500 py-2 px-3 text-lg leading-6"
-            aria-invalid={actionData?.errors?.remarks ? true : undefined}
-            aria-errormessage={
-              actionData?.errors?.remarks ? "remarks-error" : undefined
-            }
           />
         </label>
-        {actionData?.errors?.remarks && (
-          <div className="pt-1 text-red-700" id="remarks-error">
-            {actionData.errors.remarks}
-          </div>
-        )}
       </div>
+
+      <div>
+        <label className="flex w-full flex-col gap-1">
+          <span>notifyEmail: </span>
+          <input
+            name="notifyEmail"
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+          />
+        </label>
+      </div>
+
+      <div>
+        <label className="flex w-full flex-col gap-1">
+          <span>notifyWecomToken: </span>
+          <input
+            name="notifyWecomToken"
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+          />
+        </label>
+        <label className="flex w-full flex-col gap-1">
+          <span>notifyWecomMobile: </span>
+          <input
+            name="notifyWecomMobile"
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+          />
+        </label>
+      </div>
+
+      <div>
+        <label className="flex w-full flex-col gap-1">
+          <span>notifyWebhook: </span>
+          <input
+            name="notifyWebhook"
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+          />
+        </label>
+      </div>
+
+      {actionData?.error && (
+        <div className="pt-1 text-red-700" id="url-error">
+          {actionData.error}
+        </div>
+      )}
 
       <div className="text-right">
         <button

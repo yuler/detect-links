@@ -6,11 +6,12 @@
 export async function notifyWeCom({
   token,
   content,
+  mentiones = ''
 }: {
   token: string;
   content: string;
+  mentiones?: string;
 }) {
-  // `693axxx6-7aoc-4bc4-97a0-0ec2sifa5aaa`
   const response = await fetch(
     `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${token}`,
     {
@@ -22,7 +23,7 @@ export async function notifyWeCom({
         msgtype: "text",
         text: {
           content,
-          mentioned_mobile_list: ["13522711983"],
+          mentioned_mobile_list: mentiones.split(','),
         },
       }),
     }

@@ -31,10 +31,13 @@ model Link {
   remarks String
 
   // Notify settings
-  notifyEmail        String?
-  notifyWebcomToken  String?
-  notifyWebcomMobile String?
-  notifyWebhook      String?
+  notifyEmail       String?
+  notifyWecomToken  String?
+  notifyWecomMobile String?
+  notifyWebhook     String?
+
+  // Blocked
+  blocked Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

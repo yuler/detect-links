@@ -7,6 +7,8 @@ import schedule from "node-schedule";
 import { createRequestHandler } from "@remix-run/express";
 import { prisma } from "~/db.server";
 import { detect } from "~/detect.server";
+import { notifyWeCom } from "~/routes/notify.server";
+import { log } from "~/helpers.server";
 
 const app = express();
 
@@ -95,18 +97,43 @@ const rule =
     : "*/10 * * * * *"; // every 10s
 schedule.scheduleJob(rule, async () => {
   console.log("execute global job");
-  const links = await prisma.link.findMany({
-    select: { id: true, url: true },
-    // where: {
-    // }
-  });
+  const links = await prisma.link.findMany();
   for (const link of links) {
-    const { id, url } = link;
+    const { id, url, blocked, notifyEmail, notifyWecomToken, notifyWecomMobile, notifyWebhook } = link;
 
     detect(url).then((result) => {
-      if (result.blocked) {
-        console.warn(`${id}: ${url} is blocked`);
+      if (!result.blocked) return;
+
+      log(`${id}: ${url} is blocked`);
+
+      if (blocked) return
+
+      // Send Email
+      if (notifyEmail) {
+        // TODO:
       }
+      // Send notify to wecom 
+      if (notifyWecomToken) {
+        notifyWeCom({
+          token: notifyWecomToken,
+          content: `URL: ${url} 被微信禁用`,
+          mentiones: notifyWecomMobile ?? '',
+        })
+          .then(console.log)
+          .catch(console.error);
+      }
+      // Send webhook
+      if (notifyWebhook) {
+        // TODO:
+      }
+      prisma.link.update({
+        where: {
+          id,
+        },
+        data: {
+          blocked: true
+        }
+      })
     });
   }
 });

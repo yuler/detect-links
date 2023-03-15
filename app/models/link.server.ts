@@ -5,16 +5,22 @@ import { prisma } from "~/db.server";
 export type { Link } from "@prisma/client";
 
 export async function createLink({
+  userId,
   url,
   remarks,
-  userId,
-}: Pick<Link, "url" | "remarks"> & {
-  userId: User["id"];
-}) {
+  notifyEmail,
+  notifyWecomToken,
+  notifyWecomMobile,
+  notifyWebhook,
+}: Omit<Link, "id" | "createdAt" | "updatedAt">) {
   return prisma.link.create({
     data: {
       url,
       remarks,
+      notifyEmail,
+      notifyWecomToken,
+      notifyWecomMobile,
+      notifyWebhook,
       user: {
         connect: {
           id: userId,
