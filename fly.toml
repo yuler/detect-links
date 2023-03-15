@@ -1,4 +1,4 @@
-app = "wx-domain-check-61d7"
+app = "detect-links"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]

@@ -1,4 +1,4 @@
-import { domainDetect } from "./domain-detect.server";
+import { domainDetect } from "./detect.server";
 
 test("blocked domain `https://wx2142195ea9758f48-x.mp.zhongwenxiaoshuo.com/index.html` in WeChat", async () => {
   const result = await domainDetect(

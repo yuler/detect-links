@@ -3,7 +3,7 @@ import express from "express";
 import schedule from "node-schedule";
 import { createRequestHandler } from "@remix-run/express";
 import { prisma } from "~/db.server";
-import { domainDetect } from "~/domain-detect.server";
+import { domainDetect } from "~/detect.server";
 
 // Note: Simple schedule job for every minute
 // TODO: Move to queue

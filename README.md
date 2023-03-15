@@ -1,6 +1,6 @@
-# wx-domain-detect
+# detect-links
 
-> Detect whether the domain name is blocked inside WeChat
+> Detecting whether the URL links in WeChat are blocked
 
 ## Tech Stacks
 
