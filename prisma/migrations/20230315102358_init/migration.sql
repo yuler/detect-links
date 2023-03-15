@@ -14,14 +14,19 @@ CREATE TABLE "Password" (
 );
 
 -- CreateTable
-CREATE TABLE "Note" (
+CREATE TABLE "Link" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "body" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "remarks" TEXT NOT NULL,
+    "notifyEmail" TEXT,
+    "notifyWecomToken" TEXT,
+    "notifyWecomMobile" TEXT,
+    "notifyWebhook" TEXT,
+    "blocked" BOOLEAN DEFAULT false,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "userId" TEXT NOT NULL,
-    CONSTRAINT "Note_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "Link_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
@@ -29,3 +34,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Password_userId_key" ON "Password"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Link_url_key" ON "Link"("url");
