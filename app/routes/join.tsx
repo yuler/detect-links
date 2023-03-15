@@ -27,7 +27,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  if (!email.endsWith('@col.com')) {
+  if (!email.endsWith("@col.com")) {
     return json(
       { errors: { email: "Email is must end with @col.com", password: null } },
       { status: 400 }

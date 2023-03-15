@@ -7,25 +7,25 @@ import { detect } from "~/detect.server";
 
 // Note: Simple schedule job for every minute
 // TODO: Move to queue
-const rule = process.env.NODE_ENV === 'production'
-  ? '*/5 * * * *' // every 5m
-  : '*/10 * * * * *' // every 10s
+const rule =
+  process.env.NODE_ENV === "production"
+    ? "*/5 * * * *" // every 5m
+    : "*/10 * * * * *"; // every 10s
 schedule.scheduleJob(rule, async () => {
   console.log("execute global job");
   const links = await prisma.link.findMany({
-    select: { id: true, url: true},
+    select: { id: true, url: true },
     // where: {
     // }
-  })
+  });
   for (const link of links) {
-    const { id, url } = link
-    
-    detect(url)
-      .then(result => {
-        if (result.blocked) {
-          console.warn(`${id}: ${url} is blocked`)
-        }
-      })
+    const { id, url } = link;
+
+    detect(url).then((result) => {
+      if (result.blocked) {
+        console.warn(`${id}: ${url} is blocked`);
+      }
+    });
   }
 });
 
@@ -48,7 +48,7 @@ app.all(
       }
 );
 
-const port = process.env.PORT ?? 3000
+const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);

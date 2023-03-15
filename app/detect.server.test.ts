@@ -9,8 +9,6 @@ test("blocked link `https://wx2142195ea9758f48-x.mp.zhongwenxiaoshuo.com/index.h
 });
 
 test("unblocked link `https://baidu.com` in WeChat", async () => {
-  const result = await detect(
-    "https://baidu.com"
-  );
+  const result = await detect("https://baidu.com");
   expect(result.blocked).toBe(false);
 });

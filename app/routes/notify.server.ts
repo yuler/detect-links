@@ -1,6 +1,6 @@
 /**
  * WeCom bot notify webhook
- * 
+ *
  * @see https://developer.work.weixin.qq.com/document/path/91770
  */
 export async function notifyWeCom({
