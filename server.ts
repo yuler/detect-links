@@ -1,35 +1,47 @@
 import path from "path";
 import express from "express";
+import compression from "compression";
+import morgan from "morgan";
+import helmet from "helmet";
 import schedule from "node-schedule";
 import { createRequestHandler } from "@remix-run/express";
 import { prisma } from "~/db.server";
 import { detect } from "~/detect.server";
 
-// Note: Simple schedule job for every minute
-// TODO: Move to queue
-const rule =
-  process.env.NODE_ENV === "production"
-    ? "*/5 * * * *" // every 5m
-    : "*/10 * * * * *"; // every 10s
-schedule.scheduleJob(rule, async () => {
-  console.log("execute global job");
-  const links = await prisma.link.findMany({
-    select: { id: true, url: true },
-    // where: {
-    // }
-  });
-  for (const link of links) {
-    const { id, url } = link;
+const app = express();
 
-    detect(url).then((result) => {
-      if (result.blocked) {
-        console.warn(`${id}: ${url} is blocked`);
-      }
-    });
+app.use(async (req, res, next) => {
+  res.set("x-fly-region", process.env.FLY_REGION ?? "unknown");
+  res.set("Strict-Transport-Security", `max-age=${60 * 60 * 24 * 365 * 100}`);
+
+  // /clean-urls/ -> /clean-urls
+  if (req.path.endsWith("/") && req.path.length > 1) {
+    const query = req.url.slice(req.path.length);
+    const safepath = req.path.slice(0, -1).replace(/\/+/g, "/");
+    res.redirect(301, safepath + query);
+    return;
   }
+  next();
 });
 
-const app = express();
+app.use(compression());
+
+// http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
+app.disable("x-powered-by");
+
+// Remix fingerprints its assets so we can cache forever.
+app.use(
+  "/build",
+  express.static("public/build", { immutable: true, maxAge: "1y" })
+);
+
+// Everything else (like favicon.ico) is cached for an hour. You may want to be
+// more aggressive with this caching.
+app.use(express.static("public", { maxAge: "1h" }));
+
+app.use(morgan("tiny"));
+
+app.use(helmet());
 
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
@@ -68,3 +80,27 @@ function purgeRequireCache() {
     }
   }
 }
+
+// Note: Simple schedule job for every minute
+// TODO: Move to queue
+const rule =
+  process.env.NODE_ENV === "production"
+    ? "*/5 * * * *" // every 5m
+    : "*/10 * * * * *"; // every 10s
+schedule.scheduleJob(rule, async () => {
+  console.log("execute global job");
+  const links = await prisma.link.findMany({
+    select: { id: true, url: true },
+    // where: {
+    // }
+  });
+  for (const link of links) {
+    const { id, url } = link;
+
+    detect(url).then((result) => {
+      if (result.blocked) {
+        console.warn(`${id}: ${url} is blocked`);
+      }
+    });
+  }
+});
