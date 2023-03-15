@@ -3,7 +3,7 @@ import express from "express";
 import schedule from "node-schedule";
 import { createRequestHandler } from "@remix-run/express";
 import { prisma } from "~/db.server";
-import { domainDetect } from "~/detect.server";
+import { detect } from "~/detect.server";
 
 // Note: Simple schedule job for every minute
 // TODO: Move to queue
@@ -12,15 +12,15 @@ const rule = process.env.NODE_ENV === 'production'
   : '*/10 * * * * *' // every 10s
 schedule.scheduleJob(rule, async () => {
   console.log("execute global job");
-  const domains = await prisma.domain.findMany({
+  const links = await prisma.link.findMany({
     select: { id: true, url: true},
     // where: {
     // }
   })
-  for (const domain of domains) {
-    const { id, url } = domain
+  for (const link of links) {
+    const { id, url } = link
     
-    domainDetect(url)
+    detect(url)
       .then(result => {
         if (result.blocked) {
           console.warn(`${id}: ${url} is blocked`)

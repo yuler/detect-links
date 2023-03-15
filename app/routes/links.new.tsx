@@ -3,7 +3,7 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
 
-import { createDomain } from "~/models/domain.server";
+import { createLink } from "~/models/link.server";
 import { requireUserId } from "~/session.server";
 
 export async function action({ request }: ActionArgs) {
@@ -40,9 +40,9 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const domain = await createDomain({ url, remarks, userId });
+  const link = await createLink({ url, remarks, userId });
 
-  return redirect(`/domains/${domain.id}`);
+  return redirect(`/links/${link.id}`);
 }
 
 export default function New() {

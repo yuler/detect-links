@@ -3,27 +3,27 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getDomain, deleteDomain } from "~/models/domain.server";
+import { getLink, deleteLink } from "~/models/link.server";
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   const userId = await requireUserId(request);
   invariant(params.id, "id not found");
 
-  const domain = await getDomain({ userId, id: params.id });
-  if (!domain) {
+  const link = await getLink({ userId, id: params.id });
+  if (!link) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ domain });
+  return json({ link });
 }
 
 export async function action({ request, params }: ActionArgs) {
   const userId = await requireUserId(request);
   invariant(params.id, "id not found");
 
-  await deleteDomain({ userId, id: params.id });
+  await deleteLink({ userId, id: params.id });
 
-  return redirect("/domains");
+  return redirect("/links");
 }
 
 export default function Id() {
@@ -31,8 +31,8 @@ export default function Id() {
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.domain.url}</h3>
-      <p className="py-6">{data.domain.remarks}</p>
+      <h3 className="text-2xl font-bold">{data.link.url}</h3>
+      <p className="py-6">{data.link.remarks}</p>
       <hr className="my-4" />
       <Form method="post">
         <button
@@ -56,7 +56,7 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Domain not found</div>;
+    return <div>Link not found</div>;
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);

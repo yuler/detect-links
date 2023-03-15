@@ -4,7 +4,7 @@
  *
  * @see https://mp.weixinbridge.com/mp/wapredirect?url=https://wx2142195ea9758f48-x.mp.zhongwenxiaoshuo.com/index.html
  */
-export async function domainDetect(url: string) {
+export async function detect(url: string) {
   const response = await fetch(
     `https://mp.weixinbridge.com/mp/wapredirect?url=${encodeURIComponent(url)}`,
     { redirect: "follow" }

@@ -15,7 +15,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   password Password?
-  domains  Domain[]
+  links    Link[]
 }
 
 model Password {
@@ -25,10 +25,16 @@ model Password {
   userId String @unique
 }
 
-model Domain {
+model Link {
   id      String @id @default(cuid())
   url     String @unique
   remarks String
+
+  // Notify settings
+  notifyEmail        String?
+  notifyWebcomToken  String?
+  notifyWebcomMobile String?
+  notifyWebhook      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

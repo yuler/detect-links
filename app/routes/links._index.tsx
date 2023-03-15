@@ -1,11 +1,11 @@
 import { Link } from "@remix-run/react";
 
-export default function DomainIndexPage() {
+export default function Index() {
   return (
     <p>
-      No domain selected. Select a domain on the left, or{" "}
+      No link selected. Select a link on the left, or{" "}
       <Link to="new" className="text-blue-500 underline">
-        create a new domain.
+        create a new link.
       </Link>
     </p>
   );

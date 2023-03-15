@@ -4,12 +4,12 @@ import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
 import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
-import { getDomainList } from "~/models/domain.server";
+import { getLinkList } from "~/models/link.server";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
-  const domainList = await getDomainList({ userId });
-  return json({ domainList });
+  const linkList = await getLinkList({ userId });
+  return json({ linkList });
 }
 
 export default function Index() {
@@ -20,7 +20,7 @@ export default function Index() {
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
         <h1 className="text-3xl font-bold">
-          <Link to=".">Domains</Link>
+          <Link to=".">Links</Link>
         </h1>
         <p>{user.email}</p>
         <Form action="/logout" method="post">
@@ -36,25 +36,25 @@ export default function Index() {
       <main className="flex h-full bg-white">
         <div className="h-full w-80 border-r bg-gray-50">
           <Link to="new" className="block p-4 text-xl text-blue-500">
-            + New Domain
+            + New Link
           </Link>
 
           <hr />
 
-          {data.domainList.length === 0 ? (
-            <p className="p-4">No domains yet</p>
+          {data.linkList.length === 0 ? (
+            <p className="p-4">No links yet</p>
           ) : (
             <ol>
-              {data.domainList.map((domain) => (
-                <li key={domain.id}>
+              {data.linkList.map((link) => (
+                <li key={link.id}>
                   <NavLink
                     className={({ isActive }) =>
                       `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
                     }
-                    to={domain.id}
+                    to={link.id}
                   >
-                    <p>{domain.url}</p>
-                    <p className="text-gray-500 text-sm">{domain.remarks}</p>
+                    <p>{link.url}</p>
+                    <p className="text-gray-500 text-sm">{link.remarks}</p>
                   </NavLink>
                 </li>
               ))}
