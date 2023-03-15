@@ -37,7 +37,7 @@ model Link {
   notifyWebhook     String?
 
   // Blocked
-  blocked Boolean @default(false)
+  blocked Boolean? @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
