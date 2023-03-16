@@ -12,4 +12,6 @@
 fly apps create detect-links
 fly volumes create data --size 1
 fly secrets set SESSION_SECRET=$(openssl rand -hex 32)
+# Connecting to your database
+fly ssh console -C database-cli
 ```
